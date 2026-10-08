@@ -4,10 +4,11 @@
 
 hl.config({
     input = {
-        kb_layout  = "us",
+        -- Remember to include the arabic language in here. I'll create a README explaining how this works.
+        kb_layout  = "us,ara",
         kb_variant = "",
         kb_model   = "",
-        kb_options = "",
+        kb_options = "grp:alt_shift_toggle",  -- Alt+Shift switches layout
         kb_rules   = "",
 
         follow_mouse = 1,
@@ -19,6 +20,7 @@ hl.config({
         },
     },
 })
+
 
 hl.gesture({
     fingers   = 3,
