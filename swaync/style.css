@@ -1,108 +1,179 @@
-@define-color cc-bg rgba(23, 63, 79, 0.4);
+/* ─────────────────────────────────────────────────────────────────────────────
+ * SwayNC — styled to match the waybar theme (matugen palette, 20px pills)
+ * ───────────────────────────────────────────────────────────────────────────── */
 
-@define-color noti-text-color rgba(53, 185, 171, 1);
-@define-color noti-border-color rgba(53, 185, 171, 0.4);
-@define-color noti-bg rgba(23, 63, 79, 0.4);
-@define-color noti-bg-hover rgba(23, 63, 79, 1);
-@define-color noti-bg-focus rgba(23, 63, 79, 0.6);
-@define-color noti-close-bg rgba(255, 255, 255, 0.1);
-@define-color noti-close-bg-hover rgba(255, 255, 255, 0.15);
+/* Want this to follow matugen automatically? Uncomment the import and delete
+ * the "Palette" block below (adjust the path if your layout differs):
+ *
+ * @import url("../waybar/tokens/colors.css");
+ */
 
-@define-color bg-selected rgba(33, 164, 223, 1);
+/*======== Palette: mirrors ~/.config/waybar/tokens/colors.css (matugen) ========*/
+@define-color surface                   #0f1416;
+@define-color surface_container         #1b2023;
+@define-color surface_container_high    #252b2d;
+@define-color surface_container_highest #303638;
+@define-color on_surface                #dee3e6;
+@define-color on_surface_variant        #bfc8cc;
+@define-color primary                   #88d1ec;
+@define-color on_primary                #003544;
+@define-color secondary_fixed_dim       #b3cad4;
+@define-color tertiary                  #c3c3eb;
+@define-color outline                   #8a9296;
+@define-color outline_variant           #40484c;
+
+/*======== Urgency colors (same reds as waybar's critical state) ========*/
+@define-color urgency-critical #f38ba8;   /* important */
+@define-color urgency-normal   #88d1ec;   /* normal    */
+@define-color urgency-low      #8a9296;   /* low       */
+
+/*======== Translucent surfaces (Hyprland blur shows through) ========*/
+@define-color card-bg         rgba(27, 32, 35, 0.88);
+@define-color card-bg-hover   rgba(37, 43, 45, 0.95);
+@define-color panel-bg        rgba(15, 20, 22, 0.88);
+@define-color pill-bg         rgba(48, 54, 56, 0.80);
+@define-color pill-bg-hover   rgba(48, 54, 56, 1);
+
 
 * {
-    font-family: "Source Sans Pro";
-    font-size:   15px;
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 13px;
+  text-shadow: none;
 }
+
+
+/*======== Popup notifications ========*/
 
 .notification-row {
   outline: none;
+  background: transparent;
 }
 
 .notification-row:focus,
 .notification-row:hover {
-  background: @noti-bg-focus;
+  background: transparent;
+}
+
+.notification-background {
+  background: transparent;
 }
 
 .notification {
-  border-radius: 12px;
-  margin: 6px 12px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.7),
-    0 2px 6px 2px rgba(0, 0, 0, 0.3);
+  margin: 6px 10px;
   padding: 0;
+  border-radius: 20px;
+  background: @card-bg;
+  border: 1px solid @outline_variant;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
 }
-
-.critical {
-  background: @bg-selected;
-  padding: 6px;
-  border-radius: 12px;
-}
-
-/* Uncomment to enable specific urgency colors
-.low {
-  background: yellow;
-  padding: 6px;
-  border-radius: 12px;
-}
-
-.normal {
-  background: green;
-  padding: 6px;
-  border-radius: 12px;
-}
-
-.critical {
-  background: red;
-  padding: 6px;
-  border-radius: 12px;
-}
-*/
 
 .notification-content {
   background: transparent;
-  padding: 6px;
-  border-radius: 12px;
+  padding: 10px 12px;
+  border-radius: 20px;
 }
 
+/* Urgency: accent border + a left bar, nothing else changes */
+.low {
+  border-color: alpha(@urgency-low, 0.6);
+  box-shadow: inset 4px 0 0 @urgency-low;
+}
+
+.normal {
+  border-color: alpha(@urgency-normal, 0.6);
+  box-shadow: inset 4px 0 0 @urgency-normal;
+}
+
+.critical {
+  background: alpha(@urgency-critical, 0.14);
+  border: 1px solid @urgency-critical;
+  box-shadow: inset 4px 0 0 @urgency-critical;
+}
+
+.critical .summary {
+  color: @urgency-critical;
+}
+
+.low .summary {
+  color: @urgency-low;
+}
+
+.summary {
+  color: @primary;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.time {
+  color: @outline;
+  margin-right: 18px;
+  font-size: 11px;
+}
+
+.body {
+  color: @on_surface;
+  background: transparent;
+}
+
+.low .body {
+  color: @on_surface_variant;
+}
+
+.image {
+  border-radius: 14px;
+}
+
+.body-image {
+  margin-top: 6px;
+  border-radius: 14px;
+  background-color: @surface_container_high;
+}
+
+
+/*======== Close button ========*/
+
 .close-button {
-  background: @noti-close-bg;
-  color: @noti-text-color;
-  text-shadow: none;
+  background: @pill-bg;
+  color: @on_surface_variant;
   padding: 0;
-  border-radius: 100%;
   margin-top: 10px;
-  margin-right: 16px;
-  box-shadow: none;
-  border: none;
+  margin-right: 14px;
   min-width: 24px;
   min-height: 24px;
+  border-radius: 100%;
+  border: none;
+  box-shadow: none;
 }
 
 .close-button:hover {
-  box-shadow: none;
-  background: @noti-close-bg-hover;
+  background: @urgency-critical;
+  color: @surface;
   transition: all 0.15s ease-in-out;
-  border: none;
 }
+
+
+/*======== Action buttons ========*/
 
 .notification-default-action,
 .notification-action {
-  padding: 4px;
+  padding: 6px;
   margin: 0;
+  background: @pill-bg;
+  color: @secondary_fixed_dim;
+  border: none;
+  border-top: 1px solid @outline_variant;
   box-shadow: none;
-  background: @noti-bg;
-  border: 1px solid @noti-border-color;
-  color: white;
 }
 
 .notification-default-action:hover,
 .notification-action:hover {
   -gtk-icon-effect: none;
-  background: @noti-bg-hover;
+  background: @primary;
+  color: @on_primary;
 }
 
 .notification-default-action {
-  border-radius: 12px;
+  border-radius: 20px;
 }
 
 /* When alternative actions are visible */
@@ -113,106 +184,165 @@
 
 .notification-action {
   border-radius: 0px;
-  border-top: none;
-  border-right: none;
+  border-left: 1px solid @outline_variant;
 }
 
-/* add bottom border radius to eliminate clipping */
 .notification-action:first-child {
-  border-bottom-left-radius: 10px;
+  border-bottom-left-radius: 20px;
+  border-left: none;
 }
 
 .notification-action:last-child {
-  border-bottom-right-radius: 10px;
-  border-right: 1px solid @noti-border-color;
+  border-bottom-right-radius: 20px;
 }
 
-.image {
+
+/*======== Progress bar (volume, brightness, downloads) ========*/
+
+progressbar trough {
+  min-height: 6px;
+  border-radius: 6px;
+  background: @outline_variant;
 }
 
-.body-image {
-  margin-top: 6px;
-  background-color: white;
-  border-radius: 12px;
+progressbar progress {
+  min-height: 6px;
+  border-radius: 6px;
+  background: @primary;
 }
 
-.summary {
-  color: @noti-text-color;
-  text-shadow: none;
-}
 
-.time {
-  color: @noti-text-color;
-  text-shadow: none;
-  margin-right: 18px;
-}
+/*======== Control center ========*/
 
-.body {
-  background: transparent;
-  color: @noti-text-color;
-  text-shadow: none;
-}
-
-/* The "Notifications" and "Do Not Disturb" text widget */
-.top-action-title {
-  color: @noti-text-color;
-  text-shadow: none;
-}
-
-.control-center-clear-all {
-  color: @noti-text-color;
-  text-shadow: none;
-  background: @cc-bg;
-  border: 1px solid @noti-border-color;
-  box-shadow: none;
-  border-radius: 12px;
-}
-
-.control-center-clear-all:hover {
-  background: @noti-bg-hover;
-}
-
-.control-center-dnd {
-  border-radius: 12px;
-  background: @noti-bg;
-  border: 1px solid @noti-border-color;
-  box-shadow: none;
-}
-
-.control-center-dnd:checked {
-  background: @bg-selected;
-}
-
-.control-center-dnd slider:hover {
-  background: @noti-close-bg-hover;
-}
-
-.control-center-dnd slider {
-  background: @noti-bg-hover;
-  border-radius: 12px;
-}
-
-/* The .control-center Window.
- * Can't apply padding and margin so may be easier to use "> box" instead
- */
 .control-center {
-  background: @cc-bg;
+  background: @panel-bg;
+  border: 1px solid @outline_variant;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
-/* The first control-center child. May be easier to style this than .control-center */
 .control-center > box {
+  padding: 6px;
 }
 
 .control-center-list {
   background: transparent;
 }
 
+.control-center .notification-row .notification {
+  margin: 4px 6px;
+}
+
+.control-center .notification-row:focus .notification,
+.control-center .notification-row:hover .notification {
+  background: @card-bg-hover;
+}
+
 .floating-notifications {
   background: transparent;
 }
 
-/* Window behind control center and on all other monitors */
+/* Window behind the control center and on other monitors */
 .blank-window {
   background: alpha(black, 0.25);
 }
 
+
+/*======== Title row: "Notifications" + Clear ========*/
+
+.widget-title {
+  margin: 10px 12px 4px 12px;
+}
+
+.widget-title > label {
+  color: @primary;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.widget-title > button {
+  padding: 6px 16px;
+  background: @surface_container;
+  color: @secondary_fixed_dim;
+  border: none;
+  border-radius: 20px;
+  box-shadow: none;
+}
+
+.widget-title > button:hover {
+  background: @primary;
+  color: @on_primary;
+}
+
+
+/*======== Do Not Disturb ========*/
+
+.widget-dnd {
+  margin: 6px 12px;
+  padding: 8px 14px;
+  background: @surface_container;
+  border-radius: 20px;
+  color: @secondary_fixed_dim;
+}
+
+.widget-dnd > label {
+  color: @secondary_fixed_dim;
+}
+
+.widget-dnd > switch {
+  background: @outline_variant;
+  border: none;
+  border-radius: 20px;
+  box-shadow: none;
+}
+
+.widget-dnd > switch:checked {
+  background: @primary;
+}
+
+.widget-dnd > switch slider {
+  background: @on_surface;
+  border-radius: 20px;
+  border: none;
+}
+
+.widget-dnd > switch:checked slider {
+  background: @on_primary;
+}
+
+
+/*======== Media player (mpris) ========*/
+
+.widget-mpris {
+  margin: 6px 12px 10px 12px;
+}
+
+.widget-mpris-player {
+  padding: 10px;
+  background: @surface_container;
+  border-radius: 20px;
+}
+
+.widget-mpris-title {
+  color: @primary;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.widget-mpris-subtitle {
+  color: @on_surface_variant;
+  font-size: 12px;
+}
+
+.widget-mpris button {
+  background: transparent;
+  color: @tertiary;
+  border-radius: 100%;
+  border: none;
+  box-shadow: none;
+}
+
+.widget-mpris button:hover {
+  background: @surface_container_highest;
+  color: @primary;
+}
