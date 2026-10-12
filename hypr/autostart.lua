@@ -18,8 +18,7 @@ hl.on("hyprland.start", function()
     -- Dark Mode
     hl.exec_cmd('gsettings set org.gnome.desktop.interface gtk-theme "YOUR_DARK_GTK3_THEME"')
     hl.exec_cmd('gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"')
-
-    hl.exec_cmd('dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP')
+    hl.exec_cmd('dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP GTK_THEME')
 
     -- Hyprsunset (started as a service, hence commented out.)
     -- systemctl --user enable --now hyprsunset.service
