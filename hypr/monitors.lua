@@ -19,6 +19,14 @@ hl.monitor({
     scale    = "auto",
 })
 
+
+-- The TV at home, MSI
+hl.monitor({
+    output   = "desc:Qingdao Haier Electronics Co. Ltd. Haier TV 0x00000001",
+    mode     = "4096x2160@30",
+    position = "auto",
+    scale    = 2.67,
+})
 -- Fallback for external/unspecified monitors
 hl.monitor({
     output   = "",
