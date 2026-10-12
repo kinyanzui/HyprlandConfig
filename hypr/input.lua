@@ -4,7 +4,6 @@
 
 hl.config({
     input = {
-        -- Remember to include the arabic language in here. I'll create a README explaining how this works.
         kb_layout  = "us,ara",
         kb_variant = "",
         kb_model   = "",
