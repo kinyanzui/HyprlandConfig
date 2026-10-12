@@ -1,0 +1,22 @@
+[git]
+# ── Colors ──────────────────────────────────────────────
+unknown   = { fg = "#8a9296" }
+ignored   = { fg = "#40484c" }
+untracked = { fg = "#fab387" }
+unstaged  = { fg = "#f9e2af", bold = true }
+staged    = { fg = "#a6e3a1" }
+added     = { fg = "#a6e3a1", bold = true }
+deleted   = { fg = "#f38ba8", bold = true }
+updated   = { fg = "#cba6f7", bold = true }
+clean     = { fg = "#40484c" }
+
+# ── Signs ───────────────────────────────────────────────
+unknown_sign   = "…"
+ignored_sign   = "!"
+untracked_sign = "?"
+unstaged_sign  = "M"
+staged_sign    = "S"
+added_sign     = "A"
+deleted_sign   = "D"
+updated_sign   = "U"
+clean_sign     = "✓"
