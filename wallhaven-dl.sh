@@ -28,7 +28,7 @@ set -euo pipefail
 
 # ----------------------------- CONFIG --------------------------------------
 
-API_KEY="${API_KEY:-$wallhaven}"           # your wallhaven API key (optional, needed for NSFW/account settings)
+API_KEY="${API_KEY:-}"           # your wallhaven API key (optional, needed for NSFW/account settings)
 QUERY="${QUERY:-hot}"                         # search query, e.g. "nature", "-people", "@username"
 CATEGORIES="${CATEGORIES:-100}"            # general/anime/people bitmask
 PURITY="${PURITY:-111}"                    # sfw/sketchy/nsfw bitmask (nsfw needs API key)
