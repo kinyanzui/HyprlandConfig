@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
-# Enable/disable a monitor in Hyprland (Lua config).
+# Keep the laptop panel on and mirror every other monitor to it (Hyprland, Lua config).
+# Nothing in here ever disables a monitor.
 #
-#   set-display.sh <monitor name> on       enable the monitor
-#   set-display.sh <monitor name> off      disable it, but only if another monitor is active;
-#                                          if it is the only one, lock the screen instead
-#   set-display.sh <monitor name> rescue   re-enable it only if NO monitor is active
-#                                          (used by the monitor.removed hook)
+#   set-display.sh <monitor name> ensure   make sure the monitor is enabled
+#   set-display.sh <monitor name> mirror   ensure, then mirror every other active
+#                                          monitor to it (keeps each one's current mode)
 #
 # Needs: hyprctl, jq
 
@@ -13,7 +12,7 @@ display="$1"
 state="$2"
 
 if [ -z "$display" ] || [ -z "$state" ]; then
-    echo "Usage: ${0##*/} <monitor> <on|off|rescue>" >&2
+    echo "Usage: ${0##*/} <monitor> <ensure|mirror>" >&2
     exit 1
 fi
 
@@ -27,33 +26,40 @@ enable_display() {
     })"
 }
 
+# Is the monitor in the list of active monitors?
+is_active() {
+    hyprctl -j monitors | jq -e --arg d "$display" 'any(.[]; .name == $d)' >/dev/null
+}
+
 case "$state" in
-    on)
-        enable_display
+    ensure)
+        is_active || enable_display
         ;;
 
-    off)
-        # count active monitors other than the one we're about to disable
-        others=$(hyprctl -j monitors | jq --arg d "$display" '[.[] | select(.name != $d)] | length')
-        if (( others >= 1 )); then
-            hyprctl eval "hl.monitor({ output = '$display', disabled = true })"
-        else
-            # nothing else connected: lock instead of blanking everything
-            pidof hyprlock >/dev/null || hyprlock
-        fi
-        ;;
-
-    rescue)
-        # let Hyprland settle after the monitor event, then check
+    mirror)
+        # let Hyprland settle after the plug-in event
         sleep 0.5
-        active=$(hyprctl -j monitors | jq 'length')
-        if (( active == 0 )); then
-            enable_display
-        fi
+        is_active || enable_display
+
+        # Every other active monitor that isn't already mirroring $display.
+        # Prints "<name> <WxH@Hz>" using the mode it is running right now.
+        hyprctl -j monitors | jq -r --arg d "$display" '
+            .[]
+            | select(.name != $d and .mirrorOf != $d)
+            | "\(.name) \(.width)x\(.height)@\((.refreshRate * 100 | round) / 100)"
+        ' | while read -r name mode; do
+            hyprctl eval "hl.monitor({
+                output   = '$name',
+                mode     = '$mode',
+                position = 'auto',
+                scale    = 1,
+                mirror   = '$display'
+            })"
+        done
         ;;
 
     *)
-        echo "Usage: ${0##*/} <monitor> <on|off|rescue>" >&2
+        echo "Usage: ${0##*/} <monitor> <ensure|mirror>" >&2
         exit 1
         ;;
 esac

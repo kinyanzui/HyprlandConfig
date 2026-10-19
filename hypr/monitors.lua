@@ -2,7 +2,8 @@
 ---- MONITORS ----
 ------------------
 
--- Primary Laptop Display (enabled by default)
+-- The laptop panel is the primary display. It is always on and is never disabled,
+-- not on lid close and not when an external monitor is connected.
 hl.monitor({
     output   = "eDP-1",
     mode     = "preferred",
@@ -11,12 +12,16 @@ hl.monitor({
     disabled = false,
 })
 
+-- Every external monitor mirrors eDP-1.
+-- Scale is irrelevant for a mirror, so it stays at 1.
+
 -- My monitor, MSI
 hl.monitor({
     output   = "desc:Microstep MAG 255F E20 BC2M506300578",
     mode     = "1920x1080@60",
     position = "auto",
-    scale    = "auto",
+    scale    = 1,
+    mirror   = "eDP-1",
 })
 
 -- The TV at home, Haier
@@ -24,39 +29,34 @@ hl.monitor({
     output   = "desc:Qingdao Haier Electronics Co. Ltd. Haier TV 0x00000001",
     mode     = "4096x2160@30",
     position = "auto",
-    scale    = 2.67,
+    scale    = 1,
+    mirror   = "eDP-1",
 })
 
--- Fallback for external/unspecified monitors
+-- Fallback for any other external monitor (must stay last)
 hl.monitor({
     output   = "",
     mode     = "preferred",
     position = "auto",
-    scale    = "auto",
+    scale    = 1,
+    mirror   = "eDP-1",
 })
 
 
------------------------------
----- LID / DOCK HANDLING ----
------------------------------
+--------------------------
+---- MIRROR SAFETY NET ----
+--------------------------
 
--- All the logic lives in scripts/set-display.sh: <monitor> <on|off|rescue>
+-- The rules above already mirror known monitors. This hook re-applies the mirror
+-- (and makes sure eDP-1 is on) whenever a monitor is plugged in, so a monitor
+-- the rules didn't catch still ends up mirrored.
+-- Logic lives in scripts/set-display.sh: <monitor> <mirror|ensure>
 local script = os.getenv("HOME") .. "/.config/hypr/scripts/set-display.sh eDP-1 "
 
--- Lid closed: disable the laptop panel, but only if another monitor is connected
--- (otherwise the script locks the screen instead of blanking everything).
-hl.bind("switch:on:Lid Switch",  hl.dsp.exec_cmd(script .. "off"), { locked = true })
-
--- Lid opened: bring the laptop panel back.
-hl.bind("switch:off:Lid Switch", hl.dsp.exec_cmd(script .. "on"),  { locked = true })
-
--- A monitor disappeared (unplugged, or eDP-1 itself was just disabled).
--- "rescue" only re-enables eDP-1 if NO monitor is active, so it can't
--- fight the lid-close handler above.
-hl.on("monitor.removed", function()
-    hl.exec_cmd(script .. "rescue")
+hl.on("monitor.added", function()
+    hl.exec_cmd(script .. "mirror")
 end)
 
-
-hl.bind("SUPER + F12",         hl.dsp.exec_cmd(script .. "off"))
-hl.bind("SUPER + SHIFT + F12", hl.dsp.exec_cmd(script .. "on"))
+-- There is deliberately no lid-switch handling here. Closing the lid does nothing
+-- to the display layout; logind decides whether the machine suspends
+-- (HandleLidSwitchDocked=ignore in /etc/systemd/logind.conf keeps it awake).
