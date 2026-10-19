@@ -12,7 +12,8 @@
   "temperature": {
     "tooltip": false,
     "interval": 10,
-    "thermal-zone": 8,
+    "hwmon-path-abs": "/sys/devices/platform/coretemp.0/hwmon",
+    "input-filename": "temp1_input",
     "critical-threshold": 80,
     "format": "{icon}",
     "format-alt": "{icon} <span size='11pt'>{temperatureC}°C</span>",
@@ -24,3 +25,13 @@
     ]
   }
 }
+
+// NOTE: In temperature, the hwmon-path-abs and input filename are used since they are more stable than using a thermal zone, who's value changes either on boot or on updating the system.
+// Run the command below to identify the correct input for this file.
+
+//   grep -l coretemp /sys/class/hwmon/hwmon*/name
+// This will give you a bunch of stuff, identify the core temp. In my case, 6
+
+
+// readlink -f /sys/class/hwmon/hwmon6/device
+// cat /sys/class/hwmon/hwmon6/temp1_label /sys/class/hwmon/hwmon6/temp1_input
