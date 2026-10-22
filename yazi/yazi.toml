@@ -67,6 +67,3 @@ group = "git"
 url = "*/"
 run = "git"
 group = "git"
-
-# NOTE: When there's need to look into the plugins, check here.
-# https://github.com/yazi-rs/plugins
