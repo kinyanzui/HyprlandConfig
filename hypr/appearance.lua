@@ -148,21 +148,22 @@ hl.config({
 
 
 ------------------------------
----- NOCTALIA LAYER RULE ------
+---- SWAYNC LAYER RULE ------
 ------------------------------
 
 -- Enables blur on the Noctalia bar and panel backgrounds.
 -- Adjust ignore_alpha alongside Noctalia's panel/bar opacity settings
 -- to dial in the blur look. See: https://docs.noctalia.dev/v4/getting-started/compositor-settings/hyprland/#blur
+--
 
-hl.layer_rule({
-    name  = "noctalia",
-    match = { namespace = "noctalia-background-.*$" },
+   hl.layer_rule({
+       name  = "swaync",
+       match = { namespace = "swaync-(control-center|notification-window)$" },
 
-    ignore_alpha = 0.5,
-    blur         = true,
-    blur_popups  = true,
-})
+       ignore_alpha = 0.5,
+       blur         = true,
+       blur_popups  = true,
+   })
 
 
 --------------------------
