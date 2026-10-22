@@ -45,9 +45,10 @@ hl.bind(mainMod .. " + V", hl.dsp.exec_cmd(os.getenv("HOME") .. "/.config/rofi/c
 -- sudo pacman -S grim slurp satty wl-clipboard
 -- Install satty: https://github.com/gabm/satty
 
+
 -- Screenshots
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd(
-    [[sh -c 'DIR=~/Pictures/screenshots && mkdir -p "$DIR" && FILE="$DIR/screenshot_$(date +%Y%m%d_%H%M%S).png" && grim -g "$(slurp)" "$FILE" && wl-copy < "$FILE" && satty --filename "$FILE" --copy-command "wl-copy"']]
+    [[sh -c 'DIR=~/Pictures/screenshots && mkdir -p "$DIR" && FILE="$DIR/screenshot_$(date +%Y%m%d_%H%M%S).png" && grim -g "$(slurp)" "$FILE" && wl-copy < "$FILE" && notify-send -i "$FILE" "Screenshot" "Copied to clipboard." && satty --filename "$FILE" --copy-command "wl-copy"']]
 ))
 
 hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd(
