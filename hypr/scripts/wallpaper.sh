@@ -10,7 +10,7 @@
 #   wallpaper.sh random       jump to a random one
 #   wallpaper.sh first        jump back to the first one
 #   wallpaper.sh set <file>   use a specific image
-#   wallpaper.sh pick         choose one from a rofi menu
+#   wallpaper.sh pick         choose one from a rofi grid with image previews
 
 # ── Settings ─────────────────────────────────────────────────────────────────
 WALL_DIR="${WALL_DIR:-$HOME/Pictures/Wallpapers/wallhaven}"     # scanned recursively
@@ -18,6 +18,10 @@ LINK="${WALLPAPER_LINK:-$HOME/Pictures/Wallpapers/current}"
 INTERVAL="${WALLPAPER_INTERVAL:-600}"                            # seconds (10 min)
 FIT="${WALLPAPER_FIT:-cover}"
 PIDFILE="${XDG_RUNTIME_DIR:-/tmp}/wallpaper-daemon.pid"
+ROFI_THEME="${WALLPAPER_ROFI_THEME:-$HOME/.config/rofi/wallpaper.rasi}"
+THUMB_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper-thumbs"
+THUMB_SIZE="480x270"                                            # preview size (16:9)
+IM="$(command -v magick || command -v convert)"                 # ImageMagick, for previews
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 notify() { command -v notify-send >/dev/null 2>&1 && notify-send -t 1500 "Wallpaper" "$1"; }
@@ -83,6 +87,33 @@ step() {   # step <next|prev|random|first> [notify]
     apply "$t" "$2"
 }
 
+# Previews for the rofi picker: small cached thumbnails, so rofi doesn't have to load
+# 4K originals. A thumbnail is rebuilt when its image changes (path + mtime).
+make_thumb() {   # make_thumb <image> <thumbnail>
+    local tmp="$2.tmp.$$.jpg"
+    nice -n 19 "$IM" "$1[0]" -thumbnail "${THUMB_SIZE}^" -gravity center -extent "$THUMB_SIZE" \
+        -background '#0f1416' -flatten -quality 85 "$tmp" 2>/dev/null \
+        && mv -f "$tmp" "$2" || rm -f "$tmp"
+}
+
+# Fills the thumbs array (same order as walls), creating missing previews 4 at a time.
+build_thumbs() {
+    thumbs=()
+    if [ -z "$IM" ]; then thumbs=("${walls[@]}"); return; fi     # no ImageMagick: use the originals
+    mkdir -p "$THUMB_DIR"
+    find "$THUMB_DIR" -type f -mtime +30 -delete 2>/dev/null
+    local f t key
+    for f in "${walls[@]}"; do
+        key="$(printf '%s|%s' "$f" "$(stat -c %Y "$f")" | md5sum | cut -d' ' -f1)"
+        t="$THUMB_DIR/$key.jpg"
+        thumbs+=("$t")
+        [ -s "$t" ] && continue
+        make_thumb "$f" "$t" &
+        while [ "$(jobs -rp | wc -l)" -ge 4 ]; do wait -n; done
+    done
+    wait
+}
+
 # Restart the auto-switch timer after a manual change.
 nudge() {
     local pid
@@ -101,6 +132,7 @@ daemon() {
     trap ':' USR1                       # manual change: just wake up and restart the timer
 
     step first ""                       # every boot starts at the first wallpaper
+    ( build_thumbs ) >/dev/null 2>&1 &  # warm the picker previews in the background
 
     local sleeper
     while :; do
@@ -127,7 +159,14 @@ case "${1:-next}" in
         ;;
     pick)
         scan
-        choice="$(printf '%s\n' "${walls[@]#"$WALL_DIR"/}" | rofi -dmenu -i -p "Wallpaper")"
+        current_index
+        build_thumbs
+        choice="$(
+            for i in "${!walls[@]}"; do
+                printf '%s\0icon\x1f%s\n' "${walls[$i]#"$WALL_DIR"/}" "${thumbs[$i]}"
+            done | rofi -dmenu -i -p "Wallpaper" -show-icons -no-sort -matching normal \
+                -selected-row "$(( idx < 0 ? 0 : idx ))" -theme "$ROFI_THEME"
+        )"
         [ -z "$choice" ] && exit 0
         apply "$WALL_DIR/$choice" notify
         nudge
