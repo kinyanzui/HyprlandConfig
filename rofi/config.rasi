@@ -11,7 +11,7 @@ configuration {
     hover-select:        true;
     me-select-entry:     "";
     me-accept-entry:     "MousePrimary";
-    icon-theme:          "Papirus cirle light";
+    icon-theme:          "Papirus-Light";
 
     matching:            "prefix";
     tokenize:            false;
