@@ -31,8 +31,16 @@ hl.on("hyprland.start", function()
     -- swayosd server
     hl.exec_cmd('swayosd-server')
 
+    -- swaync
+    hl.exec_cmd('swaync')
+
+
     -- Autostart for wallpapers.
     hl.exec_cmd(os.getenv("HOME") .. "/.config/hypr/scripts/wallpaper.sh start")
+
+
+    -- Autostart for battery monitor.
+    hl.exec_cmd(os.getenv("HOME") .. "/.config/hypr/scripts/battery-monitor.sh start")
     --
     hl.on("hyprland.start", function()
         hl.exec_cmd("wl-paste --type text --watch cliphist store")
